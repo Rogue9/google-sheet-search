@@ -29,8 +29,11 @@ async def search_sheets(search_number: str):
 
         rows = data.get("values", [])
 
-        for row in rows:
-            if any(search_number in str(cell) for cell in row):
-                results.append({"sheet": title, "row": row})
+search_lower = search_number.lower()
+
+for row in rows:
+    if any(search_lower in str(cell).lower() for cell in row):
+        results.append({"sheet": title, "row": row})
 
     return results
+
