@@ -1,5 +1,6 @@
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
+import Levenshtein
 
 # Google Sheet ID
 SPREADSHEET_ID = "1J_ZQkVy22gq_xDpD5K2enfY7pIKpjlpJAx9jeSzmqHA"
@@ -10,12 +11,16 @@ creds = Credentials.from_service_account_file(
     scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]
 )
 
-async def search_sheets(search_number: str):
-    """Search all sheets for a string (case-insensitive, letters/numbers)."""
+async def search_sheets(search_number: str, threshold: int = 1):
+    """
+    Fuzzy search all sheets for the input string.
+    - Case-insensitive
+    - Letters, numbers, mixed codes
+    - Tolerates small differences (default threshold=1)
+    """
     search_lower = search_number.lower()
     service = build("sheets", "v4", credentials=creds)
 
-    # Get list of sheets
     metadata = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
     sheet_list = metadata.get("sheets", [])
 
@@ -33,7 +38,9 @@ async def search_sheets(search_number: str):
         rows = data.get("values", [])
 
         for row in rows:
-            if any(search_lower in str(cell).lower() for cell in row):
-                results.append({"sheet": title, "row": row})
-
+            for cell in row:
+                cell_str = str(cell).lower()
+                if Levenshtein.distance(search_lower, cell_str) <= threshold:
+                    results.append({"sheet": title, "row": row})
+                    break  # Avoid duplicates
     return results
