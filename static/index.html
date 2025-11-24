@@ -6,7 +6,7 @@
     <title>Warranty Scrap Search</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        input { padding: 10px; width: 200px; margin-right: 10px; }
+        input, select { padding: 10px; margin-right: 10px; }
         button { padding: 10px; }
         table { border-collapse: collapse; width: 100%; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; }
@@ -16,7 +16,13 @@
 </head>
 <body>
     <h1>Warranty Scrap Search</h1>
-    <input type="text" id="number" placeholder="Enter part number, ya corndog...">
+    <input type="text" id="number" placeholder="Enter part number, ya corndog">
+    <label for="threshold">Fuzzy Threshold:</label>
+    <select id="threshold">
+        <option value="0">0 (Exact)</option>
+        <option value="1" selected>1</option>
+        <option value="2">2</option>
+    </select>
     <button onclick="search()">Search</button>
     <span id="loading">Loading...</span>
     <div id="results"></div>
@@ -24,6 +30,7 @@
     <script>
         async function search() {
             const number = document.getElementById("number").value.trim();
+            const threshold = document.getElementById("threshold").value;
             if (!number) {
                 alert("Please enter a value.");
                 return;
@@ -34,7 +41,7 @@
             resultsDiv.innerHTML = "";
 
             try {
-                const response = await fetch(`/api/find?number=${encodeURIComponent(number)}`);
+                const response = await fetch(`/api/find?number=${encodeURIComponent(number)}&threshold=${threshold}`);
                 const data = await response.json();
 
                 if (data.length === 0) {
@@ -69,4 +76,9 @@
             } catch (error) {
                 resultsDiv.innerHTML = `<p style="color:red;">Error: ${error}</p>`;
             } finally {
-                document.getEle
+                document.getElementById("loading").style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
