@@ -18,9 +18,10 @@ def read_index():
 # API endpoint to search the spreadsheet
 @app.get("/api/find")
 async def find(query: str = Query(...)):
-    return await search_sheets(query)
+    return await search_sheets(number)
 
 # Run using dynamic port (Render sets PORT environment variable)
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
+
