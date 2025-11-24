@@ -9,6 +9,8 @@ creds = Credentials.from_service_account_file(
 )
 
 async def search_sheets(search_number: str):
+    search_lower = search_number.lower()
+
     service = build("sheets", "v4", credentials=creds)
 
     metadata = service.spreadsheets().get(
@@ -29,11 +31,8 @@ async def search_sheets(search_number: str):
 
         rows = data.get("values", [])
 
-search_lower = search_number.lower()
-
-for row in rows:
-    if any(search_lower in str(cell).lower() for cell in row):
-        results.append({"sheet": title, "row": row})
+        for row in rows:
+            if any(search_lower in str(cell).lower() for cell in row):
+                results.append({"sheet": title, "row": row})
 
     return results
-
