@@ -13,5 +13,6 @@ def read_index():
 
 @app.get("/api/find")
 async def find(number: str = Query(...)):
-    return await search_sheets(query)
+    return await search_sheets(Query)
+
 
