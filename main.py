@@ -7,15 +7,29 @@ from sheets import search_sheets
 
 app = FastAPI()
 
-# Serve static files (HTML, CSS, JS)
+# Serve static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Homepage
+# Homepage GET
 @app.get("/")
 def read_index():
     return FileResponse("static/index.html")
 
+# Homepage HEAD for health checks
+@app.head("/")
+def head_index():
+    return FileResponse("static/index.html")
+
 # API endpoint for searching the spreadsheet
 @app.get("/api/find")
-async def find(number: str = Query(...)):  # Use str to allow letters and numbers
-    return await search_sheets(number)
+async def find(number: str = Query(...), threshold: int = Query(1)):
+    """
+    number: string to search
+    threshold: max Levenshtein distance for fuzzy matching (default=1)
+    """
+    return await search_sheets(number, threshold)
+
+# Run app with dynamic Render port
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
