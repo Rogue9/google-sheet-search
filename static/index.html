@@ -23,13 +23,13 @@
 
     <script>
         async function search() {
-            const number = document.getElementById("number").value;
+            const query = document.getElementById("number").value;
             if (!number) return;
 
             const resDiv = document.getElementById("results");
             resDiv.innerHTML = "Searching...";
 
-            const data = await fetch(`/api/find?number=${number}`).then(r => r.json());
+            const data = await fetch(`/api/find?number=${query}`).then(r => r.json());
 
             if (!data.length) {
                 resDiv.innerHTML = "No results found.";
@@ -49,4 +49,5 @@
     </script>
 </body>
 </html>
+
 
