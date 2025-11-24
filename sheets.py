@@ -1,22 +1,21 @@
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 
-# Your Google Sheet ID
+# Google Sheet ID
 SPREADSHEET_ID = "1J_ZQkVy22gq_xDpD5K2enfY7pIKpjlpJAx9jeSzmqHA"
 
-# Read service account credentials from the file (Render secret)
+# Load service account credentials from secret file
 creds = Credentials.from_service_account_file(
     "serviceAccount.json",
     scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]
 )
 
 async def search_sheets(search_number: str):
-    """Search all sheets for the given alphanumeric string, case-insensitive"""
+    """Search all sheets for a string (case-insensitive, letters/numbers)."""
     search_lower = search_number.lower()
-
     service = build("sheets", "v4", credentials=creds)
 
-    # Get metadata to list all sheets
+    # Get list of sheets
     metadata = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
     sheet_list = metadata.get("sheets", [])
 
@@ -24,7 +23,7 @@ async def search_sheets(search_number: str):
 
     for sheet in sheet_list:
         title = sheet["properties"]["title"]
-        range_ = f"{title}!A:Z"  # search columns A to Z
+        range_ = f"{title}!A:Z"
 
         data = service.spreadsheets().values().get(
             spreadsheetId=SPREADSHEET_ID,
