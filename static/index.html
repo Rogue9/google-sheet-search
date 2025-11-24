@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Google Sheet Search</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        input { width: 80%; padding: 12px; font-size: 1.1em; }
+        button { padding: 12px; font-size: 1.1em; margin-top: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        td, th { border: 1px solid #ccc; padding: 8px; }
+        th { background: #eee; }
+    </style>
+</head>
+<body>
+    <h2>Search Google Sheets</h2>
+
+    <input id="number" type="number" placeholder="Enter number...">
+    <button onclick="search()">Search</button>
+
+    <div id="results"></div>
+
+    <script>
+        async function search() {
+            const number = document.getElementById("number").value;
+            if (!number) return;
+
+            const resDiv = document.getElementById("results");
+            resDiv.innerHTML = "Searching...";
+
+            const data = await fetch(`/api/find?number=${number}`).then(r => r.json());
+
+            if (!data.length) {
+                resDiv.innerHTML = "No results found.";
+                return;
+            }
+
+            let html = "";
+            data.forEach(item => {
+                html += `<h3>Sheet: ${item.sheet}</h3>`;
+                html += `<table><tr>`;
+                item.row.forEach(cell => html += `<td>${cell}</td>`);
+                html += `</tr></table>`;
+            });
+
+            resDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
